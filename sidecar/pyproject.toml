@@ -1,0 +1,12 @@
+[project]
+name = "immich-auto-describe-sidecar"
+version = "0.1.0"
+description = "Inference sidecar for the immich-auto-describe plugin (local + cloud VLM fleet)"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "httpx>=0.27",
+    "pillow>=10.4",
+    "pydantic>=2.9",
+]

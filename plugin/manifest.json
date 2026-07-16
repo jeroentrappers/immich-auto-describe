@@ -1,0 +1,59 @@
+{
+  "name": "immich-auto-describe",
+  "version": "0.1.0",
+  "title": "Auto Describe (AI captions)",
+  "description": "Generate AI visual descriptions and tags for photos and videos using a local or cloud vision model, via the auto-describe sidecar.",
+  "author": "jeroentrappers",
+  "wasmPath": "dist/plugin.wasm",
+  "templates": [
+    {
+      "name": "auto-describe-new-uploads",
+      "title": "Auto-describe new uploads",
+      "description": "When a photo or video is uploaded, generate an AI description + tags (skips assets that already have a description).",
+      "trigger": "AssetMetadataExtraction",
+      "steps": [
+        {
+          "method": "immich-auto-describe#describe",
+          "config": {
+            "sidecarUrl": "http://immich-auto-describe:8000",
+            "language": "en",
+            "overwriteExisting": false
+          }
+        }
+      ],
+      "uiHints": ["Enrich"]
+    }
+  ],
+  "methods": [
+    {
+      "name": "describe",
+      "title": "Generate AI description",
+      "description": "Send the asset to the description sidecar (local/cloud VLM) and store the returned caption + tags.",
+      "types": ["AssetV1"],
+      "schema": {
+        "type": "object",
+        "properties": {
+          "sidecarUrl": {
+            "type": "string",
+            "title": "Sidecar URL",
+            "description": "Base URL of the auto-describe sidecar service"
+          },
+          "language": {
+            "type": "string",
+            "title": "Output language",
+            "description": "Language for the generated description (e.g. en, nl, de)",
+            "default": "en"
+          },
+          "overwriteExisting": {
+            "type": "boolean",
+            "title": "Overwrite existing",
+            "description": "Replace a description even if one already exists (never overwrites manual edits unless enabled)",
+            "default": false
+          }
+        },
+        "required": ["sidecarUrl"]
+      },
+      "uiHints": ["Enrich"]
+    }
+  ]
+}

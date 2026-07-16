@@ -1,0 +1,11 @@
+# node / plugin build
+plugin/node_modules/
+plugin/dist/
+# python
+__pycache__/
+*.pyc
+.venv/
+# runtime
+sidecar/out/
+out/
+.env

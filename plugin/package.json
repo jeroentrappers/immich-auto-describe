@@ -1,0 +1,19 @@
+{
+  "name": "immich-auto-describe-plugin",
+  "version": "0.1.0",
+  "description": "Immich plugin: auto-generate AI visual descriptions for assets",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "npm run build:tsc && npm run build:wasm",
+    "build:tsc": "plugin-sdk prepareBuild && tsc --noEmit && node esbuild.js",
+    "build:wasm": "extism-js dist/index.js -i dist/index.d.ts -o dist/plugin.wasm"
+  },
+  "license": "AGPL-3.0",
+  "devDependencies": {
+    "@extism/js-pdk": "^1.0.1",
+    "@immich/plugin-sdk": "latest",
+    "@immich/sdk": "latest",
+    "esbuild": "^0.28.0",
+    "typescript": "^6.0.0"
+  }
+}

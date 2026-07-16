@@ -1,0 +1,36 @@
+# Auto-describe sidecar. Attach it to the same network as immich-server so the
+# plugin (http://immich-auto-describe:8000) and this service can reach each other
+# and Immich's API.
+services:
+  immich-auto-describe:
+    build: ./sidecar
+    container_name: immich-auto-describe
+    restart: unless-stopped
+    environment:
+      # Immich API base (include /api). Use the internal service name on the immich network.
+      IMMICH_URL: "http://immich-server:2283/api"
+      IMMICH_API_KEY: "${IMMICH_API_KEY}"
+      DEFAULT_LANG: "${DEFAULT_LANG:-en}"
+      # Optional cloud keys referenced by PROVIDERS[].api_key_env
+      OPENROUTER_API_KEY: "${OPENROUTER_API_KEY:-}"
+      # Fleet: one or more OpenAI-compatible backends (local and/or cloud).
+      PROVIDERS: |
+        [
+          {"name":"local","base_url":"http://host.docker.internal:1234/v1",
+           "model":"qwen/qwen3-vl-8b","concurrency":4,"max_dim":768}
+        ]
+    # Example cloud-only fleet (no local GPU) — set OPENROUTER_API_KEY and swap PROVIDERS:
+    #   [{"name":"openrouter","base_url":"https://openrouter.ai/api/v1",
+    #     "model":"qwen/qwen2.5-vl-7b-instruct","api_key_env":"OPENROUTER_API_KEY",
+    #     "concurrency":8,"max_dim":1024}]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - immich
+    ports:
+      - "8000:8000"   # optional: expose for backfill / debugging
+
+networks:
+  immich:
+    external: true
+    # name: immich_default   # set to your Immich compose network name
