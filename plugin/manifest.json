@@ -30,6 +30,8 @@
       "title": "Generate AI description",
       "description": "Send the asset to the description sidecar (local/cloud VLM) and store the returned caption + tags.",
       "types": ["AssetV1"],
+      "hostFunctions": true,
+      "allowedHosts": ["*"],
       "schema": {
         "type": "object",
         "properties": {
