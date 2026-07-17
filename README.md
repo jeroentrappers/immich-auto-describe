@@ -8,6 +8,10 @@ Descriptions land in each asset's `description` field: searchable in Immich, exp
 EXIF, editable, and screen-reader friendly. It **complements** CLIP smart-search and OCR (it
 consumes date/location/people/OCR as context) rather than replacing them.
 
+📦 **[Deployment guide → DEPLOY.md](DEPLOY.md)**
+
+Related Immich discussions: [Auto visual descriptions (#29988)](https://github.com/immich-app/immich/discussions/29988) · [Plugin marketplace / easy install (#29998)](https://github.com/immich-app/immich/discussions/29998)
+
 ## How it works
 
 ```
