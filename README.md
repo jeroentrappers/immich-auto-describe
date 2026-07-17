@@ -61,17 +61,28 @@ automatically.
 
 ## 2. Build & install the plugin
 
+Prereqs: **Node.js** and the **`extism-js`** compiler:
+
 ```bash
-cd plugin
-npm install
-npm run build        # needs `extism-js` on PATH (https://github.com/extism/js-pdk)
-# -> dist/plugin.wasm  (+ manifest.json)
+curl -Ls https://raw.githubusercontent.com/extism/js-pdk/main/install.sh | bash   # installs extism-js (+ binaryen)
 ```
 
-Install `plugin/` (manifest.json + dist/plugin.wasm) into Immich via the admin **Plugins**
-page, then create a **workflow** from the bundled `auto-describe-new-uploads` template (or add
-the `describe` method to your own), setting `sidecarUrl` to `http://immich-auto-describe:8000`
-and your `language`. New uploads are now described automatically.
+Then build (one command):
+
+```bash
+cd plugin
+./build.sh          # -> dist/plugin.wasm
+```
+
+`build.sh` first builds the **vendored `@immich/plugin-sdk`** (it is *not* published to npm —
+this repo vendors its source under `plugin/vendor/plugin-sdk`), then runs
+`prepareBuild → esbuild → extism-js`. (On npm ≥ 12 you may need to approve esbuild's install
+script once — `build.sh` does this automatically.)
+
+Install the plugin (`plugin/manifest.json` + `plugin/dist/plugin.wasm`) via the Immich admin
+**Plugins** page, then create a **workflow** from the bundled `auto-describe-new-uploads`
+template (or add the `describe` method to your own), setting `sidecarUrl` to
+`http://immich-auto-describe:8000` and your `language`. New uploads are described automatically.
 
 ## 3. Backfill the existing library
 

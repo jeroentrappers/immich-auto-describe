@@ -1,6 +1,8 @@
 # node / plugin build
 plugin/node_modules/
 plugin/dist/
+plugin/vendor/plugin-sdk/node_modules/
+plugin/vendor/plugin-sdk/dist/
 # python
 __pycache__/
 *.pyc
