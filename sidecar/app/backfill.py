@@ -2,13 +2,15 @@
 
   python -m app.backfill --type IMAGE           # all photos missing a description
   python -m app.backfill --type VIDEO --limit 50
+  python -m app.backfill --since-days 7         # only assets uploaded in the last week
 
-Resumable via out/backfill_<type>.txt; writes via the Immich API (needs a write key).
-Concurrency = sum of provider concurrency across the fleet.
+Newest first. Resumable via out/backfill_<type>.txt; writes via the Immich API
+(needs a write key). Concurrency = sum of provider concurrency across the fleet.
 """
 import argparse
 import threading
 import time
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from . import immich
@@ -25,6 +27,8 @@ def main():
     ap.add_argument("--language", default=DEFAULT_LANG)
     ap.add_argument("--overwrite", action="store_true")
     ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--since-days", type=float, default=0,
+                    help="only assets uploaded to Immich in the last N days (0 = whole library)")
     args = ap.parse_args()
 
     is_video = args.type == "VIDEO"
@@ -37,7 +41,12 @@ def main():
 
     lock = threading.Lock()
     ck = open(ckpt, "a")
-    gen = immich.iter_assets(args.type)
+    filters = {}
+    if args.since_days:
+        since = datetime.now(timezone.utc) - timedelta(days=args.since_days)
+        filters["createdAfter"] = since.isoformat()
+        print(f"only assets uploaded since {since:%Y-%m-%d %H:%M} UTC")
+    gen = immich.iter_assets(args.type, **filters)
     counters = {"done": 0, "skip": 0, "err": 0}
     t0 = time.time()
     stop = threading.Event()
@@ -74,7 +83,8 @@ def main():
                     img = immich.thumbnail(aid)
                     prompt = image_prompt(args.language, ctx)
                 res = fleet.analyze(img, prompt)
-                desc = build_description(res, people, prefix=AI_PREFIX, is_video=is_video)
+                desc = build_description(res, people, prefix=AI_PREFIX, is_video=is_video,
+                                         lang=args.language)
                 immich.set_description(aid, desc, res["tags"])
                 with lock:
                     ck.write(aid + "\n"); ck.flush()

@@ -59,5 +59,6 @@ def describe(req: DescribeRequest):
         prompt = image_prompt(req.language, ctx)
 
     res = fleet.analyze(image, prompt)
-    description = build_description(res, people, prefix=AI_PREFIX, is_video=is_video)
+    description = build_description(res, people, prefix=AI_PREFIX, is_video=is_video,
+                                    lang=req.language)
     return DescribeResponse(description=description, tags=res["tags"], caption=res["caption"])

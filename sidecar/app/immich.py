@@ -69,10 +69,13 @@ def video_montage(asset_id: str, n: int = VIDEO_FRAMES, cols: int = 3, cell: int
     return grid
 
 
-def iter_assets(asset_type: str = "IMAGE", page_size: int = 1000):
+def iter_assets(asset_type: str = "IMAGE", page_size: int = 1000, **filters):
+    """Assets of one type, newest first. ``filters`` go straight into the metadata
+    search (e.g. ``createdAfter=<iso>`` for "uploaded since")."""
     page = 1
     while True:
-        body = {"size": page_size, "page": page, "type": asset_type, "withExif": True, "withPeople": True}
+        body = {"size": page_size, "page": page, "type": asset_type, "withExif": True, "withPeople": True,
+                "order": "desc", **filters}
         data = _client.post(f"{IMMICH_URL}/search/metadata", json=body, timeout=120).json()
         chunk = data.get("assets", {})
         for a in chunk.get("items", []):

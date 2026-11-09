@@ -63,6 +63,15 @@ The fleet load-balances across providers (least-busy first), caps concurrency pe
 and self-heals: a provider that fails repeatedly is benched for a cooldown and rejoins
 automatically.
 
+**Reasoning models in LM Studio** (Gemma 4, Qwen3 thinking, …) think before every caption,
+and LM Studio's OpenAI endpoint ignores requests to turn that off. Use its native API instead:
+`"api":"lmstudio"` (optional `"reasoning":"off"|"on"`, default `off`) — about 5× faster:
+
+```json
+{"name":"lmstudio","base_url":"http://host.docker.internal:1234","api":"lmstudio",
+ "model":"gemma-4-e4b-it","concurrency":2,"max_dim":768}
+```
+
 ## 2. Build & install the plugin
 
 Prereqs: **Node.js** and the **`extism-js`** compiler:
@@ -96,6 +105,9 @@ The plugin only fires on new uploads. For everything already there:
 docker compose exec immich-auto-describe python -m app.backfill --type IMAGE
 docker compose exec immich-auto-describe python -m app.backfill --type VIDEO
 ```
+
+Newest first. To keep up with recent uploads without the plugin (e.g. from a timer), limit it
+to assets uploaded in the last N days: `python -m app.backfill --since-days 7`.
 
 Resumable, idempotent (skips assets that already have a description unless `--overwrite`),
 and uses the whole fleet. Requires an Immich **write** key.
